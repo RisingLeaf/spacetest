@@ -3,6 +3,9 @@ local S = minetest.get_translator("st_core")
 local mod_path = minetest.get_modpath("st_core")
 
 dofile(mod_path.."/weapon.lua")
+dofile(mod_path.."/building.lua")
+dofile(mod_path.."/mapgen.lua")
+dofile(mod_path.."/enemy.lua")
 
 
 local function sign(x)
@@ -100,7 +103,7 @@ minetest.register_on_joinplayer(function(player, last_login)
 	player:set_pos(vector.new(1,1,0))
 	player:set_physics_override({gravity = 0, speed=2})
 	player:set_inventory_formspec("")
-	--player:hud_set_flags({hotbar = true, healthbar=false, crosshair=true, wielditem=true, breathbar=true})
+	player:hud_set_flags({hotbar = true, healthbar=false, crosshair=true, wielditem=false, breathbar=false})
 	player:set_properties({
 		mesh = "spaceship.obj",
 		textures = {"spaceship.png"},
@@ -109,6 +112,9 @@ minetest.register_on_joinplayer(function(player, last_login)
 		collisionbox = {-0.25, -0.1, -0.25, 0.25, 0.1, 0.25},
 		stepheight = 0.55,
 		eye_height = 0.5,
+		glow = 10,
+		light_range = 14,
+		light_intensity = 1.0,
 	})
 	player:set_sky({
 		-- base_color = "#000000",
@@ -124,23 +130,19 @@ minetest.register_on_joinplayer(function(player, last_login)
 		visible = false,
 	})
 
-	-- Give the player the projectile launcher item
-	local inv = player:get_inventory()
-	inv:add_item("main", "st_core:projectile_launcher")
 
-	-- Set the active item to the projectile launcher
-	local wielded_item = player:get_wielded_item()
-	if wielded_item:get_name() ~= "st_core:projectile_launcher" then
-		player:set_wielded_item("st_core:projectile_launcher")
+	local item_names = {"st_core:projectile_launcher", "st_core:building_menu"}
+	local inventory = player:get_inventory()
+	--local hotbar_size = inventory:get_size("main")
+	for i = 1, 9 do
+		inventory:set_stack("main", i, ItemStack(item_names[i]))
 	end
+
 
 	local meta = player:get_meta()
 	meta:set_int("max_energy", 100)
 	meta:set_int("energy", 100)
 	meta:set_int("asteroid_count", meta:get_int("asteroid_count") or 0)
-
-	minetest.chat_send_all(meta:get_int("energy"))
-
 	-- Add the energy hud:
 	local energy_hud_id = player:hud_add({
 		hud_elem_type = "statbar",
@@ -181,5 +183,11 @@ minetest.register_on_joinplayer(function(player, last_login)
 	end)
 
 	-- Prepare the Envoirement, this should only be done once on world creation
-	prepare()
+	local times = meta:get_int("times") or 0
+	if times <= 0 then
+		minetest.after(1, function()
+  			prepare()
+		end)
+		meta:set_int("times", 1)
+	end
 end)

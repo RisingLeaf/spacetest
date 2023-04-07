@@ -2,7 +2,7 @@
 minetest.register_entity("st_core:projectile", {
 	-- Entity properties
 	hp_max = 1,
-	physical = false,
+	physical = true,
 	weight = 0,
 	collisionbox = {-0.1,-0.1,-0.1, 0.1,0.1,0.1},
 	visual = "sprite",
@@ -68,4 +68,7 @@ minetest.register_tool("st_core:projectile_launcher", {
 		-- Play a shooting sound
 		-- minetest.sound_play("my_shooting_sound", {pos = pos})
 	end,
+
+	on_drop = function ()
+	end
 })
