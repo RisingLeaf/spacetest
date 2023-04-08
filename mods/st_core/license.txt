@@ -1,4 +1,10 @@
 File:
-space_*
+  textures/space_*
 License: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
 Attribution: kurtk84 (available from https://opengameart.org/content/space-skybox-1)
+Note: edited with gimp
+
+File:
+  sounds/cannon.wav
+License: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
+Attribution: Lambich (available from: https://freesound.org/people/Lambich/sounds/350579/)

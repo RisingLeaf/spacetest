@@ -28,6 +28,8 @@ local function alien_behavior(self, dtime)
 			projectile:setvelocity({x = norm_dir.x * 10, y = norm_dir.y * 10, z = norm_dir.z * 10})
 			projectile:get_luaentity().owner = self.object:get_luaentity()
 
+			minetest.sound_play({name = "cannon"}, {pos=pos})
+
 			self.attack_timer = self.attack_cooldown
 		end
 	else
@@ -38,8 +40,6 @@ local function alien_behavior(self, dtime)
 		self.object:set_velocity(vel)
 
 		self.object:set_yaw(math.atan2(-vel.x, vel.z))
-		local pitch = math.atan2(vel.y, math.sqrt(vel.x^2 + vel.z^2))
-		self.object:set_rotation({x=pitch, y=-self.object:get_yaw(), z=0})
 	end
 
 	self.attack_timer = self.attack_timer - dtime
@@ -54,7 +54,7 @@ minetest.register_entity("st_core:alien_ship", {
 		mesh = "alien.obj",
 		textures = {"alien.png"},
 	},
-	health = 20,
+	health = 10,
 	attack_damage = 5,
 	attack_cooldown = 1,
 	attack_range = 10,
@@ -83,7 +83,7 @@ minetest.register_abm({
 	nodenames = {"air"},
 	neighbors = {},
 	interval = 1,
-	chance = 10000000,
+	chance = 100000000,
 	action = function(pos)
 		if #get_entities_in_radius(pos, 100, "st_core:alien_ship") < 5 then
 			minetest.add_entity(pos, "st_core:alien_ship")

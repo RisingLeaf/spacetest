@@ -28,7 +28,7 @@ minetest.register_entity("st_core:projectile", {
 				if obj:get_luaentity() and obj:get_luaentity().name ~= self.name then
 					if not obj:is_player() then
 						-- Inflict damage on the collided entity
-						obj:punch(self.object, 1.0, {
+						obj:punch(self.object, 2.0, {
 							full_punch_interval = 1.0,
 							damage_groups = {fleshy = 1},
 						})
@@ -64,9 +64,9 @@ minetest.register_tool("st_core:projectile_launcher", {
 			projectile:get_luaentity().owner = player:get_player_name()
 
 			meta:set_int("energy", meta:get_int("energy") - 5)
+
+			minetest.sound_play({name = "cannon"}, {to_player = player:get_player_name()}, true)
 		end
-		-- Play a shooting sound
-		-- minetest.sound_play("my_shooting_sound", {pos = pos})
 	end,
 
 	on_drop = function ()

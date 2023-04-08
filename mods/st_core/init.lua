@@ -102,7 +102,13 @@ minetest.register_on_joinplayer(function(player, last_login)
 	player:override_day_night_ratio(1)
 	player:set_pos(vector.new(1,1,0))
 	player:set_physics_override({gravity = 0, speed=2})
-	player:set_inventory_formspec("")
+	local formspec = "size[20,8]" ..
+					 "label[1,1;1. The game is all about energy. If you run out of energy, you die.]" ..
+					 "label[1,2;2. You can lose energy by getting attacked by alien spaceships or by using your own weapon.]" ..
+					 "label[1,3;3. You can recharge energy near an energy core.]" ..
+					 "label[1,4;4. You can mine asteroids by shooting them with your weapon until they get destroyed.]" ..
+					 "label[1,5;5. You can use asteroids to build structures in the building menu. Different objects require different amounts of asteroids.]"
+	player:set_inventory_formspec(formspec)
 	player:hud_set_flags({hotbar = true, healthbar=false, crosshair=true, wielditem=false, breathbar=false})
 	player:set_properties({
 		mesh = "spaceship.obj",
@@ -180,6 +186,12 @@ minetest.register_on_joinplayer(function(player, last_login)
 	minetest.register_globalstep(function(dtime)
 		player:hud_change(energy_hud_id, "number", player:get_meta():get_int("energy") / 10)
 		player:hud_change(asteroid_hud_id, "text", player:get_meta():get_int("asteroid_count"))
+
+		local energy = player:get_meta():get_int("energy")
+		if energy <= 0 then
+			player:set_hp(0)
+			player:get_meta():set_int("energy", 100)
+		end
 	end)
 
 	-- Prepare the Envoirement, this should only be done once on world creation
@@ -190,4 +202,7 @@ minetest.register_on_joinplayer(function(player, last_login)
 		end)
 		meta:set_int("times", 1)
 	end
+
+	minetest.sound_play({name="simple_space"}, {gain = 1.0, loop=true})
+
 end)

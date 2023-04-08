@@ -1,0 +1,9 @@
+License for Code
+----------------
+
+All code written by RisingLeaf (MIT)
+
+License for Graphics and Audio:
+-------------------------------
+
+If not stated otherwise inside the mod folder, all graphics and audio files are created by RisingLeaf under the CC BY-SA 4.0 License.
