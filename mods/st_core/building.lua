@@ -16,7 +16,7 @@ minetest.register_tool("st_core:building_menu", {
 		end
 
 		-- Replace the hotbar with the building menu
-		local item_names = {"st_nodes:base_metall", "st_nodes:energy_core"}
+		local item_names = {"st_nodes:base_metall", "st_nodes:energy_core", "st_nodes:research_facility"}
 		for i=1,7 do
 			inv:set_stack("main", i, ItemStack(item_names[i]))
 		end
