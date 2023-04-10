@@ -2,6 +2,7 @@
 local BASE_METALL_COST = 1
 local ENERGY_CORE_COST = 5
 local RESEARCH_FACILITY_COST = 3
+local TURRET_COST = 2
 
 
 ---------------------------------------------------------------------------------------------------
@@ -240,7 +241,44 @@ minetest.register_node("st_nodes:turret", {
 	tiles = {"spaceship.png"},
 	collisionbox = {-0.5, 0, -0.5, 0.5, 1.0, 0.5},
 	groups = {cracky = 3},
-	sunlight_propagates = true
+	sunlight_propagates = true,
+	can_place = function(itemstack, player, pointed_thing)
+		local meta = player:get_meta()
+		local asteroids = meta:get_int("asteroid_count") or 0
+
+		if asteroids >= TURRET_COST then
+			local pointed_node = minetest.get_node(pointed_thing.under)
+			if pointed_node.name ~= "st_nodes:base_metall" then
+				minetest.chat_send_player(player:get_player_name(), "You can only build this on top of base metall.")
+				return false
+			end
+
+			meta:set_int("asteroid_count", asteroids - TURRET_COST)
+
+			return true
+		else
+			minetest.chat_send_player(player:get_player_name(), "You don't have enough asteroids to place this node. You need: "..TURRET_COST)
+			return false
+		end
+	end,
+
+	on_place = function(itemstack, placer, pointed_thing)
+		if pointed_thing.type ~= "node" then
+			return itemstack
+		end
+
+		local node_pos = pointed_thing.above
+
+		local player_name = placer:get_player_name()
+
+		if not minetest.is_protected(node_pos, player_name) and minetest.registered_nodes["st_nodes:turret"].can_place(itemstack, placer, pointed_thing) then
+			minetest.set_node(node_pos, {name="st_nodes:turret"})
+			minetest.sound_play("default_place_node_hard", {pos=node_pos})
+
+		end
+
+		return itemstack
+	end,
 })
 minetest.register_abm({
 	label = "Turret Auto Defense",
