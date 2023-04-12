@@ -6,89 +6,9 @@ dofile(mod_path.."/weapon.lua")
 dofile(mod_path.."/building.lua")
 dofile(mod_path.."/mapgen.lua")
 dofile(mod_path.."/enemy.lua")
+dofile(mod_path.."/asteroids.lua")
+dofile(mod_path.."/clouds.lua")
 
-
-local function sign(x)
-	return (x<0 and -1) or 1
-end
-
-minetest.register_entity("st_core:asteroid", {
-	-- Entity properties
-	hp_max = 10,
-	physical = true,
-	weight = 5,
-	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
-	visual = "cube",
-	visual_size = {x=1, y=1},
-	textures = {"asteroid.png", "asteroid.png", "asteroid.png", "asteroid.png", "asteroid.png", "asteroid.png"},
-
-	on_activate = function(self, staticdata)
-		-- Calculate a random velocity vector
-		local pos = self.object:get_pos()
-		local velocity = {
-			x = math.random(-4, 4),
-			y = math.random(-4, 4),
-			z = math.random(-4, 4),
-		}
-
-		velocity = vector.normalize(velocity)
-		local rnd = math.random(1, 2)
-		velocity = {x = velocity.x * rnd, y = velocity.y * rnd, z = velocity.z * rnd}
-
-		-- Set the entity's velocity
-		self.object:set_velocity(velocity)
-
-		--local size = math.random(0.5, 2)
-		--local hsize = size / 2;
-	   	--self.object:set_properties({
-		--   visual_size = {x=size, y=size},
-		--   collisionbox = {-hsize,-hsize,-hsize,hsize,hsize,hsize},
-	   	--})
-	end,
-
-	-- Entity functions
-	on_step = function(self, dtime)
-
-	end,
-
-	on_death = function(self, puncher)
-		if self.object:get_luaentity().name == "st_core:asteroid" then
-			local owner_name = puncher:get_luaentity() and puncher:get_luaentity().owner
-			if owner_name then
-				local counter = tonumber(minetest.get_player_by_name(owner_name):get_meta():get_string("asteroid_count")) or 0
-				counter = counter + 1
-				minetest.get_player_by_name(owner_name):get_meta():set_string("asteroid_count", tostring(counter))
-			end
-		end
-	end
-})
-
-local function get_entities_in_radius(pos, radius, entity_name)
-	local objects = minetest.get_objects_inside_radius(pos, radius)
-	local entities = {}
-
-	-- Loop through the list of objects and add entities of the specified type to the result table
-	for _, object in ipairs(objects) do
-	   if object:get_luaentity() and object:get_luaentity().name == entity_name then
-		  table.insert(entities, object)
-	   end
-	end
-
-	return entities
-end
-
-minetest.register_abm({
-	label = "Spawn Asteroid",
-	nodenames = {"air"},
-	neighbors = {},
-	interval = 1,
-	chance = 100000,
-	action = function(pos)
-		if #get_entities_in_radius(pos, 100, "st_core:asteroid") < 50 then
-			minetest.add_entity(pos, "st_core:asteroid")
-		end
-	end,
-})
 
 local function prepare()
 	minetest.log("action", "[core] Preparing Level...")
@@ -261,7 +181,7 @@ minetest.register_on_joinplayer(function(player, last_login)
 		local progress = meta:get_float("science_progress") / 100
 		player:hud_change(progress_bar_id, "scale", {x=bar_w * progress, y=bar_h})
 
-		local energy = meta:get_int("energy") + meta:get_int("energy_generation")
+		local energy = meta:get_int("energy") + (meta:get_int("energy_generation") * dtime)
 		meta:set_int("energy", energy)
 		if energy <= 0 then
 			player:set_hp(0)
@@ -280,11 +200,11 @@ minetest.register_on_joinplayer(function(player, last_login)
 
 			if sl == 2 then
 				meta:set_int("energy_generation", 0)
-				show_popup(player, {x = 0.5, y = 0.5}, "Your natural energy generation increased from -1 to 0")
+				show_popup(player, {x = 0.5, y = 0.5}, "Your natural energy generation increased from -1 to 0", 3)
 			end
 			if sl == 3 then
 				meta:set_int("energy_generation", 1)
-				show_popup(player, {x = 0.5, y = 0.5}, "Your natural energy generation increased from 0 to 1")
+				show_popup(player, {x = 0.5, y = 0.5}, "Your natural energy generation increased from 0 to 1", 3)
 			end
 		end
 	end)

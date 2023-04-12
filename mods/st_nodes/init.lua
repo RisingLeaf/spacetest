@@ -1,9 +1,15 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("st_nodes")
+local mod_path = minetest.get_modpath("st_nodes")
+
+-- Other nodes:
+dofile(mod_path .. "/stellar_objects.lua")
+
 -- Define asteroid cost of the nodes
 local BASE_METALL_COST = 1
 local ENERGY_CORE_COST = 5
 local RESEARCH_FACILITY_COST = 3
 local TURRET_COST = 2
-
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
@@ -298,16 +304,4 @@ minetest.register_abm({
 			end
 		end
 	end,
-})
-
----------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------
----- ASTEROID
----------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------
-
-minetest.register_node("st_nodes:asteroid", {
-	description = "Asteroid",
-	tiles = {"asteroid.png"},
-	groups = {cracky=3},
 })
