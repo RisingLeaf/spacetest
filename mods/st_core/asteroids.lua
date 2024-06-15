@@ -37,7 +37,7 @@ minetest.register_entity("st_core:asteroid", {
 		local players = minetest.get_objects_inside_radius(pos, 1.0)
 		for _, player in ipairs(players) do
 			if player:is_player() then
-				local meta = obj:get_meta()
+				local meta = player:get_meta()
 				meta:set_int("energy", meta:get_int("energy") - 5)
 				self.object:remove()
 			end
@@ -139,7 +139,7 @@ minetest.register_entity("st_core:meteor", {
 		local objects = minetest.get_objects_inside_radius(pos, 1)
 		for _, object in ipairs(objects) do
 			if object:is_player() and not object:get_player_control().sneak then
-				local meta = obj:get_meta()
+				local meta = object:get_meta()
 				meta:set_int("energy", meta:get_int("energy") - 20)
 				self.object:remove()
 			end
